@@ -10,8 +10,7 @@ from flask import Blueprint, request, jsonify
 
 # Configuración de la API de OpenAI
 openai.api_key = os.getenv('OPENAI_API_KEY')
-
-API_URL = os.getenv('API_URL')
+RESERVAS_API_URL = os.getenv('RESERVAS_API_URL')
 # Variable global para almacenar el estado de la conversación
 conversation_state = {
     "usuario_id": None,
@@ -68,6 +67,7 @@ def registrar_interaccion(usuario_id, mensaje_usuario, respuesta_bot, es_exitosa
     db.session.add(nueva_interaccion)
     db.session.commit()
 
+# Cargar servicios desde el archivo de texto
 # Función para preprocesar el texto
 def preprocesar_texto(texto):
     texto = texto.lower()
@@ -94,7 +94,6 @@ def cargar_servicios():
         print(f"Error al cargar servicios: {e}")
     return servicios
 
-# Función para cargar problemas y servicios desde el archivo de texto
 def cargar_problemas_servicios():
     problemas_servicios = {}
     try:
@@ -196,10 +195,10 @@ def handle_message(message):
     UMBRAL_SIMILITUD = 0.2
     
     if conversation_state["estado"] == "inicio" and message.strip() == '':
-        respuesta_bot = get_welcome_message()
+        respuesta_bot = "¡Hola! 👋 **Soy tu asistente para la reserva de servicios automotrices.** 🚗 ¿Cómo te puedo ayudar hoy? "
         es_exitosa = True
         registrar_interaccion(conversation_state["usuario_id"], message, respuesta_bot, es_exitosa)
-        return respuesta_bot
+        return jsonify({"message": respuesta_bot})
     
     if conversation_state["estado"] == "inicio":
         conversation_state["estado"] = "solicitar_email"
@@ -227,7 +226,6 @@ def handle_message(message):
             else:
                 respuesta_bot = "**No tienes un vehículo registrado.** 🚗 Por favor, registra tu vehículo primero."
                 conversation_state["estado"] = "solicitar_marca"
-                registrar_interaccion(conversation_state["usuario_id"], message, respuesta_bot, es_exitosa)
                 return respuesta_bot
             respuesta_bot = f"¡Hola de nuevo, **{usuario.nombre}!** 👋 ¿Qué servicio deseas reservar hoy o cuéntame qué problema tiene tu auto?"
             es_exitosa = True
@@ -358,7 +356,7 @@ def handle_message(message):
             'password': conversation_state["password"],
             'estado': 'inicio'
         }
-        response_usuario = requests.post(f'{API_URL}/usuarios', json=usuario_data)
+        response_usuario = requests.post('http://127.0.0.1:5000/usuarios', json=usuario_data)
 
         if response_usuario.status_code == 200:
             conversation_state["usuario_id"] = response_usuario.json()['usuario']
@@ -368,7 +366,7 @@ def handle_message(message):
                 'modelo': conversation_state["modelo"],
                 'año': conversation_state["año"]
             }
-            response_vehiculo = requests.post(f'{API_URL}/vehiculos', json=vehiculo_data)
+            response_vehiculo = requests.post('http://127.0.0.1:5000/vehiculos', json=vehiculo_data)
             if response_vehiculo.status_code == 200:
                 conversation_state["vehiculo_id"] = response_vehiculo.json()['vehiculo']
                 conversation_state["estado"] = "reservar_servicio"
@@ -499,7 +497,7 @@ def handle_message(message):
                 'problema': conversation_state["problema"],
                 'fecha_hora': fecha_hora_reserva.strftime('%Y-%m-%d %H:%M:%S')
             }
-            response = requests.post(f'{API_URL}/reservas', json=reserva_data)
+            response = requests.post('http://127.0.0.1:5000/reservas', json=reserva_data)
 
             if response.status_code == 200:
                 slot.reservado = True
