@@ -12,6 +12,7 @@ from flask import Blueprint, request, jsonify
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 RESERVAS_API_URL = os.getenv('RESERVAS_API_URL')
+
 # Variable global para almacenar el estado de la conversación
 conversation_state = {
     "usuario_id": None,
@@ -68,7 +69,6 @@ def registrar_interaccion(usuario_id, mensaje_usuario, respuesta_bot, es_exitosa
     db.session.add(nueva_interaccion)
     db.session.commit()
 
-# Cargar servicios desde el archivo de texto
 # Función para preprocesar el texto
 def preprocesar_texto(texto):
     texto = texto.lower()
@@ -95,6 +95,7 @@ def cargar_servicios():
         print(f"Error al cargar servicios: {e}")
     return servicios
 
+# Función para cargar problemas y servicios desde el archivo de texto
 def cargar_problemas_servicios():
     problemas_servicios = {}
     try:
