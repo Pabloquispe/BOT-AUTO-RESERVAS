@@ -11,6 +11,7 @@ from flask import Blueprint, request, jsonify
 # Configuración de la API de OpenAI
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
+RESERVAS_API_URL = os.getenv('RESERVAS_API_URL')
 # Variable global para almacenar el estado de la conversación
 conversation_state = {
     "usuario_id": None,
