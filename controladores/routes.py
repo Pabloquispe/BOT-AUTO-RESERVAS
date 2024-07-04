@@ -1,6 +1,6 @@
 from flask import request, jsonify, redirect, url_for
 from modelos.models import db, Usuario, Vehiculo, Servicio, Slot, Reserva, ComentarioServicio, Repuesto
-from controladores.conversacion import handle_message, registrar_interaccion, get_welcome_message
+from controladores.conversacion import handle_message, registrar_interaccion
 import traceback
 
 def register_routes(app):
@@ -13,16 +13,14 @@ def register_routes(app):
         try:
             user_message = request.json.get('message')
             if not user_message:
-                respuesta_bot = get_welcome_message()
+                # Responder con mensaje de bienvenida si el mensaje del usuario está vacío
+                respuesta_bot = "¡Hola! 👋 **Soy tu asistente para la reserva de servicios automotrices.** 🚗 ¿Cómo te puedo ayudar hoy? "
                 es_exitosa = True
                 registrar_interaccion(None, '', respuesta_bot, es_exitosa)
                 return jsonify({'message': respuesta_bot})
 
             bot_response = handle_message(user_message)
-            if isinstance(bot_response, dict):
-                return jsonify(bot_response)
-            else:
-                return jsonify({"message": bot_response})
+            return jsonify({"message": bot_response})
         except Exception as e:
             error_trace = traceback.format_exc()
             app.logger.error(f"Error en la ruta '/conversacion': {str(e)}\n{error_trace}")
