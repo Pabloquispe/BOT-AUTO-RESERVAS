@@ -68,7 +68,6 @@ def registrar_interaccion(usuario_id, mensaje_usuario, respuesta_bot, es_exitosa
     db.session.add(nueva_interaccion)
     db.session.commit()
 
-# Cargar servicios desde el archivo de texto
 # Función para preprocesar el texto
 def preprocesar_texto(texto):
     texto = texto.lower()
@@ -95,6 +94,7 @@ def cargar_servicios():
         print(f"Error al cargar servicios: {e}")
     return servicios
 
+# Función para cargar problemas y servicios desde el archivo de texto
 def cargar_problemas_servicios():
     problemas_servicios = {}
     try:
@@ -132,7 +132,7 @@ def encontrar_problema(problemas_servicios, consulta, umbral_similitud=0.2):
     servicios = list(problemas_servicios.values())
 
     # Preprocesa los problemas
-    problemas_preprocesados = [preprocesar_texto(problema) for problema en problemas]
+    problemas_preprocesados = [preprocesar_texto(problema) for problema in problemas]
 
     tfidf_matrix = vectorizer.fit_transform(problemas_preprocesados)
     consulta_vec = vectorizer.transform([preprocesar_texto(consulta)])
@@ -319,7 +319,7 @@ def handle_message(message):
             if conversation_state["año"] > datetime.now().year:
                 respuesta_bot = "❌ **El año del vehículo no puede ser en el futuro.** Por favor, proporciona un año válido."
                 registrar_interaccion(conversation_state["usuario_id"], message, respuesta_bot, es_exitosa)
-                return jsonify({"message": respuesta_bot)
+                return jsonify({"message": respuesta_bot})
             nombre, apellido = conversation_state["nombre_completo"].split(" ", 1) if " " in conversation_state["nombre_completo"] else (conversation_state["nombre_completo"], "")
             conversation_state["estado"] = "solicitar_password"
             respuesta_bot = "🔒 **Por favor, proporciona una contraseña para tu cuenta.**"
@@ -343,7 +343,7 @@ def handle_message(message):
             conversation_state["estado"] = "solicitar_password"
             respuesta_bot = "❌ **Las contraseñas no coinciden.** Por favor, proporciona una contraseña para tu cuenta."
             registrar_interaccion(conversation_state["usuario_id"], '********', respuesta_bot, es_exitosa)
-            return jsonify({"message": respuesta_bot)
+            return jsonify({"message": respuesta_bot})
 
         nombre, apellido = conversation_state["nombre_completo"].split(" ", 1) if " " in conversation_state["nombre_completo"] else (conversation_state["nombre_completo"], "")
         usuario_data = {
