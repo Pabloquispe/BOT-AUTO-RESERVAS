@@ -1,6 +1,6 @@
 from flask import request, jsonify, redirect, url_for
 from modelos.models import db, Usuario, Vehiculo, Servicio, Slot, Reserva, ComentarioServicio, Repuesto
-from controladores.conversacion import handle_message, registrar_interaccion
+from controladores.conversacion import handle_message, registrar_interaccion, get_welcome_message
 import traceback
 
 def register_routes(app):
@@ -143,4 +143,5 @@ def register_routes(app):
             error_trace = traceback.format_exc()
             app.logger.error(f"Error en la ruta '/reservas': {str(e)}\n{error_trace}")
             return jsonify({'error': str(e)}), 500
+
 
