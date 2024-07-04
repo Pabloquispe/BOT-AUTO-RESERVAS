@@ -8,13 +8,13 @@ def register_routes(app):
     def home():
         return redirect(url_for('auth.login'))
 
+
     @app.route('/conversacion', methods=['POST'])
     def conversacion():
         try:
             user_message = request.json.get('message')
             if not user_message:
-                # Responder con mensaje de bienvenida si el mensaje del usuario está vacío
-                respuesta_bot = "¡Hola! 👋 **Soy tu asistente para la reserva de servicios automotrices.** 🚗 ¿Cómo te puedo ayudar hoy? "
+                respuesta_bot = get_welcome_message()
                 es_exitosa = True
                 registrar_interaccion(None, '', respuesta_bot, es_exitosa)
                 return jsonify({'message': respuesta_bot})
