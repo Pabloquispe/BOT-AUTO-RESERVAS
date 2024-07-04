@@ -196,7 +196,7 @@ def handle_message(message):
     UMBRAL_SIMILITUD = 0.2
     
     if conversation_state["estado"] == "inicio" and message.strip() == '':
-        respuesta_bot = "¡Hola! 👋 **Soy tu asistente para la reserva de servicios automotrices.** 🚗 ¿Cómo te puedo ayudar hoy? "
+        respuesta_bot = get_welcome_message()
         es_exitosa = True
         registrar_interaccion(conversation_state["usuario_id"], message, respuesta_bot, es_exitosa)
         return jsonify({"message": respuesta_bot})
